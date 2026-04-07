@@ -20,7 +20,7 @@ FROM nginx:stable-alpine
 
 # Copiamos los archivos generados desde la etapa de build
 # Nota: Asegúrate de que tu carpeta de salida sea 'dist' (común en Vite) o 'build'
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Copiamos la configuración personalizada de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
