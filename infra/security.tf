@@ -11,7 +11,13 @@ resource "aws_security_group" "sg_frontend" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] 
   }
-
+  # Puerto 443: HTTPS para el candado verde
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   # Puerto 22: Para que tú puedas entrar por SSH desde tu PC
   ingress {
     from_port   = 22
@@ -58,3 +64,4 @@ resource "aws_security_group" "sg_backend" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+

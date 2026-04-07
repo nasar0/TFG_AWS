@@ -5,6 +5,9 @@ services:
     container_name: tfg-frontend
     ports:
       - "80:80"
+      - "443:443" # Muy importante: abrir el puerto HTTPS
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
 
