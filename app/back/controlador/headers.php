@@ -1,4 +1,6 @@
 <?php
+error_reporting(0); // No mostrar errores visuales
+ini_set('display_errors', 0); // No imprimir errores en el output
 // Detectamos quién llama (React)
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
