@@ -8,37 +8,76 @@ data "aws_ami" "aws_ami" {
   }
 }
 resource "aws_instance" "app" {
-  ami           = data.aws_ami.aws_ami.id
-  instance_type = "t2.micro"
-  subnet_id     = aws_subnet.public_subnet.id
-  
-  # Usamos el SG de Frontend para que sea accesible desde fuera (puerto 80/443)
+  ami                    = data.aws_ami.aws_ami.id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.sg_frontend.id]
-  
-  key_name      = "aws_key_tfg"
+  key_name               = "aws_key_tfg"
+
+  # ESTA LÍNEA ES CLAVE: Fuerza el cambio si editas el script
+  user_data_replace_on_change = true
 
   user_data = <<-EOT
     #!/bin/bash
-    # 1. Preparar el sistema e instalar git
+    # Redirigir errores a nuestro log
+    exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+    
+    echo "--- INICIO DEL DESPLIEGUE ---"
+
+    # 1. Limpiar caché y forzar instalación de paquetes uno a uno
+    dnf clean all
     dnf update -y
-    dnf install -y docker git
+    
+    echo "Instalando Git..."
+    dnf install -y git
+    echo "Instalando Docker..."
+    dnf install -y docker
+    echo "Instalando Curl..."
+    dnf install -y curl
+
+    # Verificación inmediata
+    if ! command -v git &> /dev/null; then
+        echo "ERROR: Git no se instaló. Intentando con yum..."
+        yum install -y git
+    fi
+
+    # 2. Configurar Docker
     systemctl start docker
     systemctl enable docker
+    usermod -aG docker ec2-user
 
-    # 2. Instalar Docker Compose
-    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
+    # 3. Docker Compose y Buildx (Plugins)
+    mkdir -p /usr/local/lib/docker/cli-plugins
+    curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+    ln -sf /usr/local/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
 
-    # 3. Clonar y desplegar
+    mkdir -p /usr/lib/docker/cli-plugins
+    curl -fSL "https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64" -o /usr/lib/docker/cli-plugins/docker-buildx 
+    chmod +x /usr/lib/docker/cli-plugins/docker-buildx
+
+    # 4. SWAP (Vital para t2.micro)
+    if [ ! -f /swapfile ]; then
+        echo "Creando SWAP de 2GB..."
+        fallocate -l 2G /swapfile
+        chmod 600 /swapfile
+        mkswap /swapfile
+        swapon /swapfile
+    fi
+
+    # 5. Clonar y Levantar
     cd /home/ec2-user
-    # Clonamos tu repo específico
-    git clone https://github.com/nasar0/TFG_AWS.git 
+    echo "Clonando repositorio TFG..."
+    # Usamos el usuario ec2-user para que no haya líos de permisos después
+    sudo -u ec2-user git clone https://github.com/nasar0/TFG_AWS.git
     
-    # Entramos donde está el docker-compose.yml
-    cd TFG_AWS/app 
-
-    # 4. Levantar todo el stack
-    /usr/local/bin/docker-compose up -d
+    cd TFG_AWS/app
+    
+    echo "Lanzando Docker Compose..."
+    export NODE_OPTIONS="--max-old-space-size=1024"
+    /usr/local/bin/docker-compose up --build -d
+    
+    echo "--- SCRIPT FINALIZADO EXITOSAMENTE ---"
   EOT
 
   tags = { Name = "TFG-App-Completa" }
