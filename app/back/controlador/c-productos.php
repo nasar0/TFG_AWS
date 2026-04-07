@@ -9,7 +9,7 @@ require_once("./headers.php");
 // Directorio donde se guardarán las imágenes
 $directorio = "../vista/public/img/prods/";
 if (!is_dir($directorio)) {
-    mkdir($directorio, 0777, true); // Crear la carpeta si no existe
+    // mkdir($directorio, 0777, true); // Crear la carpeta si no existe
 }
 
 // Función para manejar la subida de imágenes
