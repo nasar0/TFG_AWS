@@ -1,0 +1,13 @@
+# Ignorar archivos de configuración  AWS
+*.tfvars
+*.tfvars.json
+
+# Ignorar archivos temporales y binarios de Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Ignorar archivos del sistema
+.DS_Store
+Thumbs.db

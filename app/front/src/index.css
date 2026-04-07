@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@import 'animate.css';
+@import 'boxicons';
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+body{
+    font-family: "IBM Plex Mono", monospace;
+}
+img{
+    max-width:100%;
+}
+.mirror {
+    display: inline-block; 
+    transform: scaleX(-1); 
+}
+nav{
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 50;
+}
+#navbar {
+    font-family: "IBM Plex Mono", sans-serif ;
+}
+.flex::-webkit-scrollbar {
+  display: none;
+}
+
+.product-container {
+  position: relative;
+}
+
+.favorite-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover{
+  cursor: pointer;
+}
+#back{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 50;
+}
+/* styles.css o app.css */
+.btn {
+  @apply bg-black text-white border border-transparent hover:bg-white hover:text-black hover:border-black transition-colors duration-400;
+}
+.btn-i {
+  @apply hover:bg-black hover:text-white border hover:border-transparent bg-white text-black border-black transition-colors duration-400;
+}
+/* Animación suave para el despliegue */
+.filter-options {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Estilo para los checkboxes */
+input[type="checkbox"]:checked {
+  background-color: #4f46e5; /* Color cuando está seleccionado */
+}

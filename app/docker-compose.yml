@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # FRONTEND (React + Nginx)
+  frontend:
+    build: ./front       
+    container_name: tfg-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # BACKEND (PHP + Apache)
+  backend:
+    build: ./back        
+    container_name: tfg-backend
+    expose:
+      - "80"
+    volumes:
+      - ./back:/var/www/html   
+    environment:
+      - DB_HOST=db
+    depends_on:
+      - db
+
+  # BASE DE DATOS (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: tfg-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: tfg_db
+      MYSQL_USER: user_tfg
+      MYSQL_PASSWORD: pass_tfg
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - db_data:/var/lib/mysql
+      # OJO AQUÍ: La ruta al SQL debe ser correcta
+      - ./back/tfg.sql:/docker-entrypoint-initdb.d/tfg.sql
+
+volumes:
+  db_data:
