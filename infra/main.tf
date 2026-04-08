@@ -14,7 +14,7 @@ resource "aws_instance" "app" {
   vpc_security_group_ids = [aws_security_group.sg_frontend.id]
   key_name               = "aws_key_tfg"
 
-  # ESTA LÍNEA ES CLAVE: Fuerza el cambio si editas el script
+  # Fuerza el cambio si editas el script
   user_data_replace_on_change = true
 
   user_data = <<-EOT

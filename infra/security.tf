@@ -4,21 +4,21 @@ resource "aws_security_group" "sg_frontend" {
   name   = "sg_tfg_frontend"
   vpc_id = aws_vpc.tfg_vpc.id
 
-  # Puerto 80: El mundo entero puede ver tu React
+  # Puerto 80 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] 
   }
-  # Puerto 443: HTTPS para el candado verde
+  # Puerto 443 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  # Puerto 22: Para que tú puedas entrar por SSH desde tu PC
+  # Puerto 22 
   ingress {
     from_port   = 22
     to_port     = 22
@@ -40,16 +40,15 @@ resource "aws_security_group" "sg_backend" {
   name   = "sg_tfg_backend"
   vpc_id = aws_vpc.tfg_vpc.id
 
-  # Puerto 80: SOLO permite la entrada si viene del SG del Frontend
+  # Puerto 80 
   ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    # MAGIA: En lugar de IP, usamos el ID del grupo anterior
     security_groups = [aws_security_group.sg_frontend.id] 
   }
 
-  # SSH también limitado (opcional, pero más seguro)
+  # SSH
   ingress {
     from_port       = 22
     to_port         = 22
