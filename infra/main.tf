@@ -68,7 +68,7 @@ resource "aws_instance" "app" {
     # 5. Clonar y Levantar
     cd /home/ec2-user
     echo "Clonando repositorio TFG..."
-    # Usamos el usuario ec2-user para que no haya líos de permisos después
+    # Usamos el usuario ec2-user
     sudo -u ec2-user git clone https://github.com/nasar0/TFG_AWS.git
     
     cd TFG_AWS/app
